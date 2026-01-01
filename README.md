@@ -1,4 +1,4 @@
-# Financial Forecasting
+# Financial Forecasting: Baseline vs LSTM model for stock prediction
 
 ## Overview
 Predict tomorrow’s stock price movement (up or down) using past 30 days of data.  
