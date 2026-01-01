@@ -18,11 +18,11 @@ Compare baseline models (Logistic Regression, Random Forest) with an advanced LS
 ## Results
 | Model               | Accuracy |
 |---------------------|----------|
-| Logistic Regression | ~0.XX    |
-| Random Forest       | ~0.XX    |
-| LSTM                | ~0.XX    |
+| Logistic Regression | ~0.65    |
+| Random Forest       | ~0.66    |
+| LSTM                | ~0.48    |
 
 ## Run
 ```bash
 git clone https://github.com/yourusername/financial-forecasting.git
-jupyter notebook 2. Notebooks/stock_Baseline_vs_LSTM.ipynb
+jupyter notebook 2. Notebooks/stock_prediction.ipynb
