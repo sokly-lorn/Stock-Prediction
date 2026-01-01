@@ -25,4 +25,4 @@ Compare baseline models (Logistic Regression, Random Forest) with an advanced LS
 ## Run
 ```bash
 git clone https://github.com/yourusername/financial-forecasting.git
-jupyter notebook 2. Notebooks/financial_forecasting.ipynb
+jupyter notebook 2. Notebooks/stock_Baseline_vs_LSTM.ipynb
