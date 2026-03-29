@@ -165,23 +165,31 @@ Where:
 - `pᵢ = σ(wᵀxᵢ + b)` is the predicted probability
 - N is the number of training samples
 
-This loss has no closed-form solution — unlike linear regression's Mean Squared Error which can be solved analytically via `w = (XᵀX)⁻¹Xᵀy`. The sigmoid's non-linearity makes it impossible to isolate w algebraically. The model therefore uses **iterative optimisation** (gradient descent) to find the minimum.
+This loss has no closed-form solution — unlike linear regression's Mean Squared Error which can be solved analytically via `w = (XᵀX)⁻¹Xᵀy`. The sigmoid's non-linearity makes it impossible to isolate w algebraically. The model therefore uses **iterative optimisation** to find the minimum.
 
-### 5.3 Gradient Descent
+### 5.3 Optimiser: L-BFGS
 
-At each iteration, the gradient of the loss with respect to w is computed:
+Sklearn's `LogisticRegression` defaults to the **lbfgs** solver (Limited-memory Broyden–Fletcher–Goldfarb–Shanno), not plain gradient descent. Understanding the difference matters.
 
-```
-∂L/∂w = (1/N) * Xᵀ(p - y)
-```
-
-And weights are updated:
+**Plain gradient descent** uses only the first derivative (gradient) to take small fixed steps downhill:
 
 ```
-w ← w - α * ∂L/∂w
+w ← w - α * ∇L(w)
 ```
 
-Where α is the learning rate. This repeats until convergence (loss stops improving) or `max_iter` is reached. Setting `max_iter=500` allows up to 500 update steps before stopping.
+Where α is a fixed learning rate. It is simple but slow — it has no information about the curvature of the loss surface, so it takes the same size step regardless of whether the surface is flat or steep.
+
+**L-BFGS** is a second-order quasi-Newton method. It approximates the inverse Hessian (second derivative matrix) to estimate the curvature of the loss surface at the current point, then uses that curvature to take a geometrically informed step:
+
+```
+w ← w - H⁻¹ * ∇L(w)
+```
+
+Where `H⁻¹` is the approximate inverse Hessian. In regions where the loss surface curves sharply, L-BFGS takes small cautious steps. In flat regions, it takes large steps. This makes it significantly more efficient than gradient descent for small-to-medium datasets — typically converging in far fewer iterations.
+
+The "Limited-memory" prefix means L-BFGS does not store the full N×N Hessian matrix (which would be prohibitively large). Instead it stores only the last m gradient vectors (typically m=10) and reconstructs a low-rank approximation of H⁻¹ on the fly.
+
+`max_iter=500` therefore means up to 500 **L-BFGS iterations**, each of which already incorporates curvature information. In practice, the solver converges well before this limit on a dataset of this size.
 
 ### 5.4 Interpretation of Weights
 
@@ -409,7 +417,7 @@ The harmonic mean of Precision and Recall. Useful as a single summary metric whe
 |---|---|---|---|
 | Logistic Regression | 64.9% | 68.3% | 58.3% |
 | Random Forest | 66.0% | 69.0% | 60.4% |
-| LSTM (fixed) | — | — | — |
+| LSTM | 47.7% | 0.0% | 0.0% |
 
 **Logistic Regression** provides a clean, interpretable baseline. Its precision is competitive, but its recall indicates it misses roughly 4 in 10 real Up days. The linear decision boundary limits its ability to capture non-linear price dynamics.
 
